@@ -49,11 +49,14 @@
 
   const MATCH_KEYWORD = compileMatchers();
 
+  // autoBlock: true  → Engelle menüsü / onay (programatik tıklama; tarayıcı isTrusted / X DOM kırılabilir).
+  // autoBlock: false → yalnızca tweet gizleme; caret tıklanmaz, profil sayfasında otomatik engel yok.
   const CONFIG = {
     debounceMs: 180,
     blockCooldownMs: 2200,
     uiWaitMs: 4500,
     menuPollMs: 80,
+    autoBlock: true,
   };
 
   const processedArticles = new WeakSet();
@@ -222,29 +225,26 @@
   function collectElementLabels(el) {
     if (!el) return "";
     const parts = [
-      el.getAttribute?.("aria-label"),
-      el.getAttribute?.("title"),
+      el.getAttribute("aria-label"),
+      el.getAttribute("title"),
       el.textContent,
     ];
     return parts.filter(Boolean).join("\n");
   }
 
-  function textIndicatesBlockAction(raw) {
-    if (!raw) return false;
-    const combined = collectElementLabels(
-      typeof raw === "string" ? { textContent: raw, getAttribute: () => null } : raw
-    );
-    const text = typeof raw === "string" ? raw : combined;
+  function textIndicatesBlockAction(elOrString) {
+    const text =
+      typeof elOrString === "string" ? elOrString : collectElementLabels(elOrString);
+    if (!text || !String(text).trim()) return false;
     const t = normalizeText(text).toLowerCase();
-    if (!t && !text.trim()) return false;
     for (const re of BLOCK_UI_LATIN_WORD_RES) {
       if (re.test(t)) return true;
     }
     for (const re of BLOCK_UI_INTL_RES) {
       if (re.test(text) || re.test(t)) return true;
     }
-    if (t.includes("@") || text.includes("@")) {
-      const hay = t + "\n" + text.toLowerCase();
+    if (t.includes("@") || String(text).includes("@")) {
+      const hay = (t + "\n" + String(text).toLowerCase()).toLowerCase();
       for (const s of BLOCK_UI_AT_LINE_SUBSTRINGS) {
         if (hay.includes(s.toLowerCase())) return true;
       }
@@ -282,8 +282,7 @@
     if (!dialog) return false;
     const buttons = dialog.querySelectorAll('button[role="button"], div[role="button"]');
     for (const b of buttons) {
-      const t = normalizeText(b.textContent || "").toLowerCase();
-      if (/\bblock\b/.test(t) || /\bengelle\b/.test(t)) {
+      if (textIndicatesBlockAction(b)) {
         b.click();
         return true;
       }
@@ -406,7 +405,9 @@
 
     processedArticles.add(article);
     hideTweet(article);
-    queueBlockTask(article, handle);
+    if (CONFIG.autoBlock) {
+      queueBlockTask(article, handle);
+    }
   }
 
   let lastProfileBlockPath = "";
@@ -440,6 +441,8 @@
 
     const text = collectProfileScanText(root);
     if (!matchesKeywords(text)) return;
+
+    if (!CONFIG.autoBlock) return;
 
     if (lastProfileBlockPath === location.pathname) return;
     lastProfileBlockPath = location.pathname;
