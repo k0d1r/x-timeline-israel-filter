@@ -158,12 +158,102 @@
     return document.querySelector('div[role="menu"]');
   }
 
-  function menuItemLooksLikeBlock(el) {
-    const t = normalizeText(el.textContent || "").toLowerCase();
-    if (!t) return false;
-    if (/\bblock\b/.test(t) || /\bengelle\b/.test(t)) return true;
-    if (t.includes("@") && (t.includes("block") || t.includes("engelle"))) return true;
+  const BLOCK_UI_LATIN_WORD_RES = [
+    /\bblock\b/,
+    /\bengelle\b/,
+    /\bblockieren\b/,
+    /\bbloquear\b/,
+    /\bbloquer\b/,
+    /\bblocca\b/,
+    /\bblokkeren\b/,
+    /\bzablokuj\b/,
+    /\bblokovat\b/,
+    /\bblokir\b/,
+    /\bblockera\b/,
+    /\bblokeer\b/,
+    /\bblokkere\b/,
+    /\bblochează\b/,
+    /\bblocare\b/,
+    /\bbloquejar\b/,
+    /\bbloqueie\b/,
+    /\bbloķēt\b/,
+    /\bblokeeri\b/,
+  ];
+
+  const BLOCK_UI_INTL_RES = [
+    /заблокировать|блокировать|заблокувати|заблакіраваць/i,
+    /حظر|حجب/,
+    /ブロック/,
+    /차단/,
+    /封鎖|屏蔽/,
+    /ब्लॉक/,
+  ];
+
+  const BLOCK_UI_AT_LINE_SUBSTRINGS = [
+    "block",
+    "engelle",
+    "blockieren",
+    "bloquear",
+    "bloquer",
+    "blocca",
+    "blokkeren",
+    "zablokuj",
+    "blokovat",
+    "blokir",
+    "blockera",
+    "blokeer",
+    "blokkere",
+    "blochează",
+    "blocare",
+    "bloquejar",
+    "bloqueie",
+    "bloķēt",
+    "blokeeri",
+    "блок",
+    "заблок",
+    "حظر",
+    "ブロック",
+    "차단",
+    "封鎖",
+    "屏蔽",
+    "ब्लॉक",
+  ];
+
+  function collectElementLabels(el) {
+    if (!el) return "";
+    const parts = [
+      el.getAttribute?.("aria-label"),
+      el.getAttribute?.("title"),
+      el.textContent,
+    ];
+    return parts.filter(Boolean).join("\n");
+  }
+
+  function textIndicatesBlockAction(raw) {
+    if (!raw) return false;
+    const combined = collectElementLabels(
+      typeof raw === "string" ? { textContent: raw, getAttribute: () => null } : raw
+    );
+    const text = typeof raw === "string" ? raw : combined;
+    const t = normalizeText(text).toLowerCase();
+    if (!t && !text.trim()) return false;
+    for (const re of BLOCK_UI_LATIN_WORD_RES) {
+      if (re.test(t)) return true;
+    }
+    for (const re of BLOCK_UI_INTL_RES) {
+      if (re.test(text) || re.test(t)) return true;
+    }
+    if (t.includes("@") || text.includes("@")) {
+      const hay = t + "\n" + text.toLowerCase();
+      for (const s of BLOCK_UI_AT_LINE_SUBSTRINGS) {
+        if (hay.includes(s.toLowerCase())) return true;
+      }
+    }
     return false;
+  }
+
+  function menuItemLooksLikeBlock(el) {
+    return textIndicatesBlockAction(el);
   }
 
   function clickBlockMenuItem(menu) {
