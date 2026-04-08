@@ -1,108 +1,108 @@
-# X Anahtar Kelime Filtresi
+# X Keyword Filter
 
-Chrome ve Brave ile uyumlu Manifest V3 eklentisi. [X.com](https://x.com) / [twitter.com](https://twitter.com) sayfalarında tweet ve profil metinlerini tarar; tanımladığınız ifadelerle eşleşen içerikleri önce zaman çizelgesinden gizler, ardından mümkünse **Engelle** akışını DOM üzerinden dener.
+A Manifest V3 extension compatible with Chrome and Brave. It scans tweet and profile texts on [X.com](https://x.com) / [twitter.com](https://twitter.com); hides content matching your defined terms from the timeline first, then attempts the **Block** flow via the DOM if possible.
 
-## İsrail ile ilgili varsayılan hedefler
+## Default targets related to Israel
 
-Bu proje, X akışında **İsrail’i doğrudan ima eden veya gösteren metin/emoji** geçen içerikleri kullanıcı tarafından belirlenecek kurallara göre gizlemek veya engellemek üzere kurgulanmıştır. `content.js` içindeki **`BLOCK_TERMS`** ile liste genişletilebilir veya değiştirilebilir.
+This project is designed to hide or block content containing **text/emojis directly implying or showing Israel** in the X feed, based on user-defined rules. The list can be expanded or modified via **`BLOCK_TERMS`** in `content.js`.
 
-**Şu anki varsayılan eşleşmeler:**
+**Current default matches:**
 
-| Tür | Örnek |
+| Type | Example |
 |-----|--------|
-| Emoji | İsrail bayrağı (`🇮🇱`) — `substrings` |
-| Kelime | `Israel` ve `israel` (harf büyüklüğü ayrı ayrı) — `wholeWords` |
-| İfade | `Flag of Israel` — `phrases` |
+| Emoji | Flag of Israel (`🇮🇱`) — `substrings` |
+| Word | `Israel` and `israel` (case-sensitive) — `wholeWords` |
+| Phrase | `Flag of Israel` — `phrases` |
 
-İsrail ile ilişkili başka ifadeleri (ör. belirli İngilizce/Türkçe kalıplar, başka emoji) yine **`BLOCK_TERMS`** altında uygun listeye ekleyerek kullanabilirsiniz. Yanlış pozitif riskine dikkat edin; `wholeWords` ve `phrases` genelde `substrings` kadar agresif değildir.
+You can use other expressions related to Israel (e.g., specific English/Turkish phrases, other emojis) by adding them to the appropriate list under **`BLOCK_TERMS`**. Be careful with the risk of false positives; `wholeWords` and `phrases` are generally not as aggressive as `substrings`.
 
-## Kurulum — Google Chrome
+## Installation — Google Chrome
 
-1. Bu klasörde `manifest.json` ve `content.js` dosyalarının birlikte durduğundan emin olun.
-2. Adres çubuğuna **`chrome://extensions`** yazıp Enter’a basın.
-3. Sağ üstten **Geliştirici modu**nu açın.
-4. **Paketlenmemiş öğe yükle** (Load unpacked) → `merhaba` klasörünü seçin.
-5. Listede **X Anahtar Kelime Filtresi** görünmeli; kırmızı hata varsa `manifest.json` yolunu kontrol edin.
+1. Ensure that the `manifest.json` and `content.js` files are together in this folder.
+2. Type **`chrome://extensions`** into the address bar and press Enter.
+3. Enable **Developer mode** in the top right corner.
+4. Click **Load unpacked** → select the `merhaba` folder (or whatever you named your folder).
+5. **X Keyword Filter** should appear in the list; if there is a red error, check the `manifest.json` path.
 
-## Kurulum — Brave
+## Installation — Brave
 
-Brave da Chromium tabanlıdır; adımlar aynıdır, yalnızca eklenti sayfasının adresi farklıdır.
+Brave is also Chromium-based; the steps are the same, only the extension page address is different.
 
-1. Adres çubuğuna **`brave://extensions`** yazıp Enter’a basın.
-2. **Geliştirici modu**nu açın.
-3. **Paketlenmemiş öğe yükle** ile bu proje klasörünü (`manifest.json`’ın olduğu klasör) seçin.
-4. X’te bir sorun görürseniz (içerik betiği hiç çalışmıyorsa) geçici olarak `x.com` için **Brave Shields**’i sadece o site için hafifletmeyi deneyebilirsiniz; çoğu kurulumda gerekmez.
+1. Type **`brave://extensions`** into the address bar and press Enter.
+2. Enable **Developer mode**.
+3. Select this project folder (the folder containing `manifest.json`) using **Load unpacked**.
+4. If you see an issue on X (if the content script isn't running at all), you can try temporarily lowering **Brave Shields** just for `x.com`; this is usually not required for most setups.
 
-## Günlük kullanım (Chrome ve Brave)
+## Daily use (Chrome and Brave)
 
-- Ek bir düğmeye basmanız gerekmez: X veya Twitter sekmesinde otomatik çalışır.
-- **Ana sayfa, liste, arama** gibi tweet’lerin listelendiği sayfalarda eşleşen gönderiler gizlenir; mümkünse engelleme menüsü de denenir.
-- **Profil sayfasında** biyografi/isim eşleşirse profil üzerinden engelleme akışı tetiklenebilir.
-- Kelime listesini `content.js` içindeki **`BLOCK_TERMS`** ile değiştirdikten sonra:
-  1. `chrome://extensions` veya `brave://extensions` sayfasını açın,
-  2. Bu eklentinin kartında **yenile (↻)** simgesine tıklayın,
-  3. Açık X sekmelerini **yenileyin** (F5 veya Cmd+R / Ctrl+R).
+- No need to press an additional button: it runs automatically on the X or Twitter tab.
+- On pages where tweets are listed like **home, lists, search**, matching posts are hidden; if possible, the block menu is also attempted.
+- If the bio/name matches on a **profile page**, the blocking flow can be triggered via the profile.
+- After modifying the word list via **`BLOCK_TERMS`** in `content.js`:
+  1. Open the `chrome://extensions` or `brave://extensions` page,
+  2. Click the **refresh (↻)** icon on this extension's card,
+  3. **Refresh** any open X tabs (F5 or Cmd+R / Ctrl+R).
 
-## Geliştirme / güncelleme
+## Development / Updating
 
-`content.js` veya `manifest.json` her değiştiğinde: eklentiler sayfasında eklentiyi **yenileyin**, ardından X sekmesini yenileyin.
+Whenever `content.js` or `manifest.json` changes: **refresh** the extension on the extensions page, then refresh the X tab.
 
-## Çalışma modu: sadece gizleme vs. otomatik engelleme
+## Operating mode: hide-only vs. auto-block
 
-`content.js` içinde **`CONFIG.autoBlock`** kullanılır:
+**`CONFIG.autoBlock`** is used within `content.js`:
 
-| Değer | Davranış |
+| Value | Behavior |
 |--------|-----------|
-| **`true`** (varsayılan) | Eşleşen tweet gizlendikten sonra **Engelle** akışı denenir (`caret`, menü, onay). Profilde eşleşen biyografi/isimde profil menüsünden engel denenir. |
-| **`false`** | Yalnızca **gizleme**: zaman çizelgesinde tweet’ler sessizce gizlenir; menü açılmaz, programatik tıklama yok, profilden otomatik engel yok. |
+| **`true`** (default) | After the matching tweet is hidden, the **Block** flow is attempted (`caret`, menu, confirmation). If a bio/name matches on a profile, a block is attempted from the profile menu. |
+| **`false`** | **Hide only**: tweets are silently hidden in the timeline; no menu opens, no programmatic clicking, no automatic blocking from profiles. |
 
-Sadece gizlemek için `autoBlock: false` yapmanız yeterlidir; `queueBlockTask` satırını silmenize gerek kalmaz.
+To just hide, simply setting `autoBlock: false` is enough; you don't need to delete the `queueBlockTask` line.
 
-## Kelime / ifade ekleme
+## Adding words / phrases
 
-`content.js` dosyasının başındaki **`BLOCK_TERMS`** nesnesini düzenleyin:
+Edit the **`BLOCK_TERMS`** object at the top of the `content.js` file:
 
-| Alan | Ne zaman kullanılır |
+| Field | When to use |
 |------|----------------------|
-| `substrings` | Metnin herhangi bir yerinde geçmesi yeterli (emoji, kısa parça). Büyük/küçük harf **birebir** eşleşir. |
-| `wholeWords` | Yalnızca **tam kelime** (kelime sınırı). Harfler birebir (`Israel` ile `israel` farklı satırlarda olabilir). |
-| `phrases` | Birden fazla kelimelik ifade; kelimeler arasında boşluk sayısı esnektir. Harfler birebir. |
+| `substrings` | It is enough if it appears anywhere in the text (emoji, short snippet). Case matches **exactly**. |
+| `wholeWords` | **Whole words** only (word boundary). Characters match exactly (`Israel` and `israel` can be on different lines). |
+| `phrases` | Multi-word phrases; the number of spaces between words is flexible. Characters match exactly. |
 
-Dosyadaki yorum satırlarında da kısa örnekler vardır.
+There are also short examples in the comments within the file.
 
-## Nasıl çalışır (özet)
+## How it works (summary)
 
-- **Tarama:** Tweet’te `User-Name` ve `tweetText`; profilde açıklama ve isim alanları (`data-testid` ile).
-- **DOM:** `MutationObserver` + kısa gecikme ile birleştirilmiş tarama; işlenmiş tweet’ler `WeakSet` ile tekrar taranmaz.
-- **Gizleme:** Eşleşmede tweet hemen gizlenir (`ui-state-collapsed`, `data-view-state="hidden"` ve satır içi stil). Bu isimler `content.js` içinde `HIDDEN_CLASS` / `VIEW_STATE_ATTR` sabitleriyle tek yerden değiştirilebilir. Engelle menüsü kırılsa bile gönderi akışta görünmez kalır.
-- **Engelleme:** `caret` → menüde “engelle” eylemi (birçok dilde `block` / `bloquear` / `blockieren` vb. ve `@` içeren satırlarda ek kökler; `aria-label` / `title` da okunur) → onay diyaloğu; profil sayfasında benzer akış. Yine de X metinleri değişirse `content.js` içindeki `BLOCK_UI_*` listelerine yeni dil kalıbı eklenebilir.
+- **Scanning:** `User-Name` and `tweetText` in tweets; description and name fields in profiles (via `data-testid`).
+- **DOM:** Scanning combined with `MutationObserver` + a short delay; processed tweets are not scanned again using `WeakSet`.
+- **Hiding:** Upon a match, the tweet is hidden immediately (`ui-state-collapsed`, `data-view-state="hidden"`, and inline style). These names can be changed in one place via the `HIDDEN_CLASS` / `VIEW_STATE_ATTR` constants in `content.js`. Even if the block menu breaks, the post remains hidden in the feed.
+- **Blocking:** `caret` → "block" action in the menu (checks for `block` / `bloquear` / `blockieren` etc. in many languages and extra roots in lines containing `@`; `aria-label` / `title` are also read) → confirmation dialog; similar flow on the profile page. Still, if X texts change, new language patterns can be added to the `BLOCK_UI_*` lists in `content.js`.
 
-## Dosya yapısı
+## File structure
 
-```
+```text
 merhaba/
-├── manifest.json   # MV3 tanımı, host izinleri (x.com, twitter.com)
-├── content.js      # Tüm mantık ve BLOCK_TERMS
+├── manifest.json   # MV3 definition, host permissions (x.com, twitter.com)
+├── content.js      # All logic and BLOCK_TERMS
 └── README.md
 ```
 
-`background.js` yoktur; işlemler içerik betiğinde yapılır.
+There is no `background.js`; operations are handled in the content script.
 
-## Uyarılar ve teknik sınırlar
+## Warnings and technical limitations
 
-### X’in DOM (arayüz) değişiklikleri
+### X's DOM (interface) changes
 
-X, React tabanlı dinamik bir arayüz kullanır; `data-testid` (ör. `confirmationSheetConfirm`), `role="menu"` ve benzeri yapılar **önemsiz bir güncellemede bile değişebilir**. Bu durumda otomatik **Engelle** adımı çalışmayı durdurabilir; **gizleme** tarafı DOM’da `article` bulunduğu sürece genelde daha dayanıklı kalır.
+X uses a dynamic, React-based interface; structures like `data-testid` (e.g., `confirmationSheetConfirm`), `role="menu"`, and similar can change **even in a minor update**. In this case, the automatic **Block** step might stop working; the **hiding** side generally remains more resilient as long as the `article` element exists in the DOM.
 
-### Programatik tıklama ve `isTrusted`
+### Programmatic clicking and `isTrusted`
 
-Tarayıcıda `.click()` veya sentezlenmiş `MouseEvent` ile yapılan tıklamalarda `event.isTrusted` genelde **false** olur. X veya tarayıcı ileride yalnızca “gerçek” kullanıcı etkileşimine izin veren ek kontroller getirirse menü hiç açılmayabilir. Bu riski **istemiyorsanız** `CONFIG.autoBlock: false` ile yalnızca gizleme modunu kullanın.
+With `.click()` or synthesized `MouseEvent`s in the browser, `event.isTrusted` is generally **false**. If X or the browser introduces additional checks in the future that only allow "real" user interactions, the menu might not open at all. If you **do not** want this risk, use only the hide mode via `CONFIG.autoBlock: false`.
 
-### Diğer
+### Other
 
-- Otomatik etkileşim X kullanım koşullarına aykırı sayılabilir veya hesabın otomasyon olarak değerlendirilmesine yol açabilecek kalıplar oluşturabilir; risk size aittir.
-- Bu depo yalnızca yerel yükleme içindir; Chrome Web Mağazası yayını yapılmamıştır.
+- Automated interaction may be considered against X's terms of service or create patterns that lead the account to be flagged for automation; use at your own risk.
+- This repository is for local installation only; it has not been published to the Chrome Web Store.
 
-## Lisans
+## License
 
-Belirtilmemiştir; kişisel kullanım için projeyi istediğiniz gibi düzenleyebilirsiniz.
+Not specified; you can modify the project as you wish for personal use.
